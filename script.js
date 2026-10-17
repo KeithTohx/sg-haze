@@ -1,4 +1,4 @@
-const W = 800, H = 400;
+const W = 1000, H = 750;
 const wrapper = document.getElementById('map');
 const svg = d3.select('#svg');
 const contents = {};
@@ -31,11 +31,11 @@ const IGNORE_FOR_CENTRE = ['SOUTHERN ISLANDS', 'WESTERN ISLANDS', 'NORTH-EASTERN
 // Box offsets from the computed centre, in % of map width (x) and height (y).
 // +x moves right, +y moves down.
 const nudge = {
-  'NORTH':      { x: 6,  y: -8 },   // up, away from the centre of the island
-  'EAST':       { x: 8,  y: -1  },   // right and down, towards Changi
-  'WEST':       { x: -4, y: -4  },   // left, out into Jurong
+  'NORTH':      { x: 8,  y: -8 },   // up, away from the centre of the island
+  'EAST':       { x: 5,  y: -2  },   // right and down, towards Changi
+  'WEST':       { x: -1, y: -5  },   // left, out into Jurong
   'CENTRAL':    { x: -2,  y: -9 },   // up, so it doesn't sit on South
-  'SOUTH':      { x: 3,  y: 6  },   // down, towards the southern coast
+  'SOUTH':      { x: 4,  y: 6  },   // down, towards the southern coast
 };
 
 // Build area name -> region lookup
