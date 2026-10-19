@@ -45,6 +45,73 @@ for (const [region, cfg] of Object.entries(REGIONS)) {
 }
 
 
+const RETRY_DELAY_MS = 10000; // 10 seconds
+const MIN_RECHECK_MS = 5 * 60 * 1000; // while waiting for new data, check at most every 5 min
+
+// Reading time of the first item in the response, as milliseconds
+function dataTimestamp(response) {
+    try {
+        return new Date(response.data.items[0].timestamp).getTime();
+    } catch (e) {
+        return 0; // unexpected shape, treat as stale
+    }
+}
+
+function cachedAjax(key, settings) {
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem(key)); } catch (e) {}
+
+    if (cached) {
+        // Start of the current clock hour (Singapore is UTC+8, a whole-hour offset,
+        // so this is the same moment as the SGT hour start in any timezone)
+        const hourStart = Math.floor(Date.now() / 3600000) * 3600000;
+
+        const hasLatest = dataTimestamp(cached.data) >= hourStart;
+        const checkedRecently = Date.now() - cached.fetchedAt < MIN_RECHECK_MS;
+
+        if (hasLatest || checkedRecently) {
+            return Promise.resolve(cached.data);
+        }
+    }
+
+    return ajaxWithRetry(settings)
+        .then(data => {
+            try {
+                localStorage.setItem(key, JSON.stringify({ fetchedAt: Date.now(), data }));
+            } catch (e) {}
+            return data;
+        })
+        .catch(err => {
+            if (cached) {
+                console.warn(`Using stale cache for ${key}`);
+                try {
+                    localStorage.setItem(key, JSON.stringify({ fetchedAt: Date.now(), data: cached.data }));
+                } catch (e) {}
+                return cached.data;
+            }
+            throw err;
+        });
+};
+
+
+function ajaxWithRetry(settings) {
+    return new Promise((resolve, reject) => {
+        $.ajax(settings)
+            .done(resolve)
+            .fail((xhr) => {
+                if (xhr.status === 429) {
+                    console.warn(`Rate limited (429). Retrying in 10s...`);
+                    setTimeout(() => {
+                        ajaxWithRetry(settings).then(resolve).catch(reject);
+                    }, RETRY_DELAY_MS);
+                } else {
+                    reject(xhr);
+                }
+            });
+    });
+}
+
+
 /* --- Pollutant Standards Index (PSI) --- */
 var settings_psi = {
     "url": "https://api-open.data.gov.sg/v2/real-time/api/psi",
@@ -58,19 +125,19 @@ var settings_pm25 = {
     "timeout": 0,
 };
 
-// Load data from API 
-$.ajax(settings_pm25).done(function (response) {
-    pm25_values = response;
-
-    $.ajax(settings_psi).done(function (response) {
+// Load data from API
+cachedAjax('pm25', settings_pm25)
+    .then(function (response) {
+        pm25_values = response;
+        return cachedAjax('psi', settings_psi);
+    })
+    .then(function (response) {
         psi_values = response;
-
-        fetch('resources/MasterPlan2019PlanningAreaBoundaryNoSea.geojson')                       
-            .then(r => r.json())
-            .then(draw);
-
-    });
-});
+        return fetch('resources/MasterPlan2019PlanningAreaBoundaryNoSea.geojson');
+    })
+    .then(r => r.json())
+    .then(draw)
+    .catch(err => console.error("Failed to load data:", err));
     
 
 
