@@ -59,11 +59,11 @@ var settings_pm25 = {
 };
 
 // Load data from API 
-$.ajax(settings_psi).done(function (response) {
-    psi_values = response;
+$.ajax(settings_pm25).done(function (response) {
+    pm25_values = response;
 
-    $.ajax(settings_pm25).done(function (response) {
-        pm25_values = response;
+    $.ajax(settings_psi).done(function (response) {
+        psi_values = response;
 
         fetch('resources/MasterPlan2019PlanningAreaBoundaryNoSea.geojson')                       
             .then(r => r.json())
@@ -110,29 +110,30 @@ function draw(geo) {
         contents[region] = box.querySelector('.content');
     }
 
-    const psi_24hr = document.getElementById("psi_24hr")
-    psi_24hr.style.background = "#cbd5e1";
-    $("#message").html("Air Quality Over The Past 24 Hours");
+    getTimestamp();
+    const psi_24hr = document.getElementById("psi_24hr");
+    const pm25_1hr = document.getElementById("pm25_1hr");
+    pm25_1hr.style.background = "#cbd5e1";
+    $("#message").html("Current Air Quality");
     $("#descriptor").html(`
                 <table class="center">
                     <tr>
-                        <td>PSI Value</td>
-                        <td style="color: green;">0 - 100</td>
-                        <td style="color: rgb(250, 200, 0);">101 - 200</td>
-                        <td style="color: darkorange;">201 - 300</td>
-                        <td style="color: red;">Above 300</td>
+                        <td>µg/m&sup3</td>
+                        <td style="color: green;">0 - 55</td>
+                        <td style="color: rgb(238, 190, 0);">56 - 150</td>
+                        <td style="color: darkorange;">151 - 250</td>
+                        <td style="color: red;">Above 250</td>
                     </tr>
                     <tr>
-                        <td>Air Quality</td>
-                        <td style="color: green;">Good to Moderate</td>
-                        <td style="color: rgb(250, 200, 0);">Unhealthy</td>
-                        <td style="color: darkorange;">Very Unhealthy</td>
-                        <td style="color: red;">Hazardous</td>
+                        <td>Descriptor</td>
+                        <td style="color: green;">Normal</td>
+                        <td style="color: rgb(238, 190, 0);">Elevated</td>
+                        <td style="color: darkorange;">High</td>
+                        <td style="color: red;">Very High</td>
                     </tr>
                 </table>`);
-    getPSIValue();
-    
-    const pm25_1hr = document.getElementById("pm25_1hr")
+    getPM25Value();
+
     pm25_1hr.addEventListener("click", function(){
         psi_24hr.style.background = "#fff";
         pm25_1hr.style.background = "#cbd5e1";
@@ -142,14 +143,14 @@ function draw(geo) {
                         <tr>
                             <td>µg/m&sup3</td>
                             <td style="color: green;">0 - 55</td>
-                            <td style="color: rgb(250, 200, 0);">56 - 150</td>
+                            <td style="color: rgb(238, 190, 0);">56 - 150</td>
                             <td style="color: darkorange;">151 - 250</td>
                             <td style="color: red;">Above 250</td>
                         </tr>
                         <tr>
                             <td>Descriptor</td>
                             <td style="color: green;">Normal</td>
-                            <td style="color: rgb(250, 200, 0);">Elevated</td>
+                            <td style="color: rgb(238, 190, 0);">Elevated</td>
                             <td style="color: darkorange;">High</td>
                             <td style="color: red;">Very High</td>
                         </tr>
@@ -166,14 +167,14 @@ function draw(geo) {
                         <tr>
                             <td>PSI Value</td>
                             <td style="color: green;">0 - 100</td>
-                            <td style="color: rgb(250, 200, 0);">101 - 200</td>
+                            <td style="color: rgb(238, 190, 0);">101 - 200</td>
                             <td style="color: darkorange;">201 - 300</td>
                             <td style="color: red;">Above 300</td>
                         </tr>
                         <tr>
                             <td>Air Quality</td>
                             <td style="color: green;">Good to Moderate</td>
-                            <td style="color: rgb(250, 200, 0);">Unhealthy</td>
+                            <td style="color: rgb(238, 190, 0);">Unhealthy</td>
                             <td style="color: darkorange;">Very Unhealthy</td>
                             <td style="color: red;">Hazardous</td>
                         </tr>
@@ -203,13 +204,12 @@ function addData(region, text, colour, element) {
         contents[region].appendChild(line);
 }
 
+function getTimestamp() {
+    var updatedTimestamp = (pm25_values.data.items[0].updatedTimestamp).split("T");
+    $("#title_time").html("As at " + formatTime(updatedTimestamp[1]) + ", " + formatDate(updatedTimestamp[0]));
+}
 
 function getPSIValue() {
-
-    console.log(psi_values);
-
-    var psi_updated = (psi_values.data.items[0].updatedTimestamp).split("T")
-    $("#title_time").html("Air quality as at " + formatTime(psi_updated[1]) + ", " + formatDate(psi_updated[0]));
 
     var psi_north = psi_values.data.items[0].readings.psi_twenty_four_hourly.north
     var psi_south = psi_values.data.items[0].readings.psi_twenty_four_hourly.south
@@ -234,7 +234,7 @@ function getPSIColour(psi_value) {
     if (psi_value <= 100)
         return "green";
     else if (psi_value <= 200)
-        return "rgb(250, 200, 0)";
+        return "rgb(238, 190, 0)";
     else if (psi_value <= 300)
         return "darkorange";
     else return "red";
@@ -274,7 +274,7 @@ function getPM25Colour(pm25_value) {
     if (pm25_value <= 55)
         return "green"
     else if (pm25_value <= 150)
-        return "rgb(250, 200, 0)"
+        return "rgb(238, 190, 0)"
     else if (pm25_value <= 250)
         return "darkorange"
     else return "red"
@@ -291,7 +291,14 @@ function getPM25Descriptor(pm25_value) {
 
 function formatTime(psi_time) {
     var values = psi_time.split(":"); // 16:30:34+08:00
-    return values[0] + values[1] + "hrs";
+    var hour = values[0];
+    if (hour == "00") return "12am";
+    else if (hour < 12) 
+        return hour + "am";
+    else if (hour == 12)
+        return hour + "pm";
+    else 
+        return (hour % 12) + "pm"; 
 }
 function formatDate(psi_date) {
     var values = psi_date.split("-"); // 2026-10-17
