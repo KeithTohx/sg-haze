@@ -272,8 +272,8 @@ function addData(region, text, colour, element) {
 }
 
 function getTimestamp() {
-    var updatedTimestamp = (pm25_values.data.items[0].updatedTimestamp).split("T");
-    $("#title_time").html("As at " + formatTime(updatedTimestamp[1]) + ", " + formatDate(updatedTimestamp[0]));
+    var timestamp = (pm25_values.data.items[0].timestamp).split("T");
+    $("#title_time").html("As at " + formatTime(timestamp[1]) + ", " + formatDate(timestamp[0]));
 }
 
 function getPSIValue() {
@@ -360,8 +360,10 @@ function formatTime(psi_time) {
     var values = psi_time.split(":"); // 16:30:34+08:00
     var hour = values[0];
     if (hour == "00") return "12am";
-    else if (hour < 12) 
-        return hour + "am";
+    else if (hour < 12) {
+        if (hour.charAt(0) == "0") return hour.charAt(1) + "am";
+        else return hour + "am";
+    }
     else if (hour == 12)
         return hour + "pm";
     else 
