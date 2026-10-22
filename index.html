@@ -16,6 +16,10 @@
         <h2>Haze in Singapore</h2>
         <p id="title_time"></p>
         <div class="info-box">
+            <p style="margin-bottom: 10px;">Today's Air Quality Overview</p>
+            <div id="overview"></div>
+        </div>
+        <div class="info-box">
             <div style="margin-bottom: 10px;">
                 <a id="pm25_1hr" class="btn">1-hr PM2.5</a>
                 <a id="psi_24hr" class="btn">24-hr PSI</a>
@@ -28,7 +32,11 @@
             </div>
             <div id="descriptor"></div>
         </div>
-        <p id="source">Source: NEA via data.gov.sg</p>
+        <p id="remarks" style="color: gray;">
+            Source: NEA via data.gov.sg <br>
+            Remarks: The air quality descriptor provided in the overview is based on the maximum reading among the five regions. 
+            Refer to the individual regions for region-specific readings and descriptors.
+        </p>
     </div>
     
 

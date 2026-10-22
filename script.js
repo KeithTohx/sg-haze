@@ -178,6 +178,8 @@ function draw(geo) {
     }
 
     getTimestamp();
+    getOverview();
+
     const psi_24hr = document.getElementById("psi_24hr");
     const pm25_1hr = document.getElementById("pm25_1hr");
     pm25_1hr.style.background = "#cbd5e1";
@@ -276,6 +278,54 @@ function getTimestamp() {
     $("#title_time").html("As at " + formatTime(timestamp[1]) + ", " + formatDate(timestamp[0]));
 }
 
+function getOverview() {
+    var pm25_north = pm25_values.data.items[0].readings.pm25_one_hourly.north
+    var pm25_south = pm25_values.data.items[0].readings.pm25_one_hourly.south
+    var pm25_east = pm25_values.data.items[0].readings.pm25_one_hourly.east
+    var pm25_west = pm25_values.data.items[0].readings.pm25_one_hourly.west
+    var pm25_central = pm25_values.data.items[0].readings.pm25_one_hourly.central
+
+    var pm25 = [pm25_north, pm25_south, pm25_east, pm25_west, pm25_central]
+    var pm25_max = Math.max(...pm25)
+    var pm25_min = Math.min(...pm25)
+    var pm25_range = pm25_min + " - " + pm25_max
+    var pm25_desc = getPM25Descriptor(pm25_max)
+
+    var psi_north = psi_values.data.items[0].readings.psi_twenty_four_hourly.north
+    var psi_south = psi_values.data.items[0].readings.psi_twenty_four_hourly.south
+    var psi_east = psi_values.data.items[0].readings.psi_twenty_four_hourly.east
+    var psi_west = psi_values.data.items[0].readings.psi_twenty_four_hourly.west
+    var psi_central = psi_values.data.items[0].readings.psi_twenty_four_hourly.central
+
+    var psi = [psi_north, psi_south, psi_east, psi_west, psi_central]
+    var psi_max = Math.max(...psi)
+    var psi_min = Math.min(...psi)
+    var psi_range = psi_min + " - " + psi_max
+    var psi_desc = getPSIDescriptor(psi_max)
+
+    $("#overview").html(`
+        <div class="flex-container">
+            <div>
+                <p style="font-size: 0.8em;">1-hr PM2.5 (µg/m&sup3)</p>
+                <h4 id="pm25_min">` + pm25_min + `</h4><h4>-</h4><h4 id="pm25_max">` + pm25_max + `</h4>
+                <p id="pm25_desc">` + pm25_desc + `</p> 
+            </div>
+            <div>
+                <p style="font-size: 0.8em;">24-hr PSI</p>
+                <h4 id="psi_min">` + psi_min + `</h4><h4>-</h4><h4 id="psi_max">` + psi_max + `</h4>
+                <p id="psi_desc">` + psi_desc + `</p>
+            </div>
+        </div>`);
+
+    $("#pm25_min").css('color', getPM25Colour(pm25_min));
+    $("#pm25_max").css('color', getPM25Colour(pm25_max));
+    $("#pm25_desc").css('color', getPM25Colour(pm25_max));
+    $("#psi_min").css('color', getPSIColour(psi_min));
+    $("#psi_max").css('color', getPSIColour(psi_max));
+    $("#psi_desc").css('color', getPSIColour(psi_max));
+
+}
+
 function getPSIValue() {
 
     var psi_north = psi_values.data.items[0].readings.psi_twenty_four_hourly.north
@@ -318,11 +368,11 @@ function getPSIDescriptor(psi_value) {
 
 function getPM25Value() {
 
-    var pm25_west = pm25_values.data.items[0].readings.pm25_one_hourly.west
-    var pm25_east = pm25_values.data.items[0].readings.pm25_one_hourly.east
-    var pm25_central = pm25_values.data.items[0].readings.pm25_one_hourly.central
-    var pm25_south = pm25_values.data.items[0].readings.pm25_one_hourly.south
     var pm25_north = pm25_values.data.items[0].readings.pm25_one_hourly.north
+    var pm25_south = pm25_values.data.items[0].readings.pm25_one_hourly.south
+    var pm25_east = pm25_values.data.items[0].readings.pm25_one_hourly.east
+    var pm25_west = pm25_values.data.items[0].readings.pm25_one_hourly.west
+    var pm25_central = pm25_values.data.items[0].readings.pm25_one_hourly.central
 
     addData('NORTH', pm25_north, getPM25Colour(pm25_north), 'h4');
     addData('SOUTH', pm25_south, getPM25Colour(pm25_south), 'h4');
