@@ -18,7 +18,8 @@ const REGIONS = {
     'BEDOK', 'CHANGI', 'CHANGI BAY', 'PASIR RIS', 'PAYA LEBAR', 'TAMPINES'] },
   'NORTH': { color: '#bfdbfe', areas: [
     'CENTRAL WATER CATCHMENT', 'LIM CHU KANG', 'MANDAI', 'SEMBAWANG', 'SIMPANG',
-    'SUNGEI KADUT', 'WOODLANDS', 'YISHUN'] },
+    'SUNGEI KADUT', 'WOODLANDS', 'YISHUN', 'ANG MO KIO', 'HOUGANG', 'PUNGGOL', 
+    'SELETAR', 'SENGKANG', 'SERANGOON'] },
   'WEST': { color: '#fed7aa', areas: [
     'BOON LAY', 'BUKIT BATOK', 'BUKIT PANJANG', 'CHOA CHU KANG', 'CLEMENTI',
     'JURONG EAST', 'JURONG WEST', 'PIONEER', 'TENGAH', 'TUAS', 'WESTERN ISLANDS',
@@ -31,11 +32,11 @@ const IGNORE_FOR_CENTRE = ['SOUTHERN ISLANDS', 'WESTERN ISLANDS', 'NORTH-EASTERN
 // Box offsets from the computed centre, in % of map width (x) and height (y).
 // +x moves right, +y moves down.
 const nudge = {
-  'NORTH':      { x: 8,  y: -8 },   // up, away from the centre of the island
+  'NORTH':      { x: 2,  y: -8 },   // up, away from the centre of the island
   'EAST':       { x: 5,  y: -2  },   // right and down, towards Changi
-  'WEST':       { x: -1, y: -5  },   // left, out into Jurong
+  'WEST':       { x: -1, y: -4.5  },   // left, out into Jurong
   'CENTRAL':    { x: -2,  y: -9 },   // up, so it doesn't sit on South
-  'SOUTH':      { x: 4,  y: 6  },   // down, towards the southern coast
+  'SOUTH':      { x: 3.5,  y: 6  },   // down, towards the southern coast
 };
 
 // Build area name -> region lookup
@@ -125,6 +126,10 @@ var settings_pm25 = {
     "timeout": 0,
 };
 
+$("#overview_title").html("Loading information...");
+$("#subtitle").html("Loading information...");
+
+
 // Load data from API
 cachedAjax('pm25', settings_pm25)
     .then(function (response) {
@@ -142,6 +147,9 @@ cachedAjax('pm25', settings_pm25)
 
 
 function draw(geo) {
+    getTimestamp();
+    getOverview();
+    displayRemarks();
 
     const projection = d3.geoIdentity().reflectY(true).fitSize([W, H], geo);
     const path = d3.geoPath(projection);
@@ -152,8 +160,8 @@ function draw(geo) {
         .join('path')
         .attr('class', 'area')
         .attr('d', path)
-        .append('title')
-        .text(f => `${getArea(f)} (${areaToRegion[getArea(f)] || 'unassigned'})`);
+        .append('title');
+        // .text(f => `${getArea(f)} (${areaToRegion[getArea(f)] || 'unassigned'})`);
 
     // 2. One box per region, placed at the centre of its planning areas
     for (const [region, cfg] of Object.entries(REGIONS)) {
@@ -177,13 +185,10 @@ function draw(geo) {
         contents[region] = box.querySelector('.content');
     }
 
-    getTimestamp();
-    getOverview();
-
     const psi_24hr = document.getElementById("psi_24hr");
     const pm25_1hr = document.getElementById("pm25_1hr");
     pm25_1hr.style.background = "#cbd5e1";
-    $("#message").html("Current Air Quality");
+    $("#subtitle").html("Current Air Quality");
     $("#descriptor").html(`
                 <table class="center">
                     <tr>
@@ -206,7 +211,7 @@ function draw(geo) {
     pm25_1hr.addEventListener("click", function(){
         psi_24hr.style.background = "#fff";
         pm25_1hr.style.background = "#cbd5e1";
-        $("#message").html("Current Air Quality");
+        $("#subtitle").html("Current Air Quality");
         $("#descriptor").html(`
                     <table class="center">
                         <tr>
@@ -230,7 +235,7 @@ function draw(geo) {
     psi_24hr.addEventListener("click", function(){
         pm25_1hr.style.background = "#fff";
         psi_24hr.style.background = "#cbd5e1";
-        $("#message").html("Air Quality Over The Past 24 Hours");
+        $("#subtitle").html("Air Quality Over The Past 24 Hours");
         $("#descriptor").html(`
                     <table class="center">
                         <tr>
@@ -273,6 +278,13 @@ function addData(region, text, colour, element) {
         contents[region].appendChild(line);
 }
 
+function displayRemarks() {
+    $("#remarks").html(`
+        Source: NEA via data.gov.sg <br>
+        Remarks: The air quality descriptor provided in the overview is based on the maximum reading among the five regions. 
+        Refer to the individual regions for region-specific readings and descriptors.`);
+}
+
 function getTimestamp() {
     var timestamp = (pm25_values.data.items[0].timestamp).split("T");
     $("#title_time").html("As at " + formatTime(timestamp[1]) + ", " + formatDate(timestamp[0]));
@@ -303,6 +315,7 @@ function getOverview() {
     var psi_range = psi_min + " - " + psi_max
     var psi_desc = getPSIDescriptor(psi_max)
 
+    $("#overview_title").html("Today's Air Quality Overview");
     $("#overview").html(`
         <div class="flex-container">
             <div>

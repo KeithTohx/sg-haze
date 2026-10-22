@@ -12,11 +12,11 @@
 <body>
     <button onclick="topFunction()" id="topBtn" title="Go to top"><img src="images/top.png"></button>
 
-    <div class="container">
+    <div id="main" class="container">
         <h2>Haze in Singapore</h2>
         <p id="title_time"></p>
         <div class="info-box">
-            <p style="margin-bottom: 10px;">Today's Air Quality Overview</p>
+            <p id="overview_title" style="margin-bottom: 10px;"></p>
             <div id="overview"></div>
         </div>
         <div class="info-box">
@@ -24,7 +24,7 @@
                 <a id="pm25_1hr" class="btn">1-hr PM2.5</a>
                 <a id="psi_24hr" class="btn">24-hr PSI</a>
             </div>
-            <p id="message">Loading information...</p>
+            <p id="subtitle"></p>
             <div>
                 <div class="map-wrapper" id="map">
                     <svg id="svg" viewBox="0 0 1000 750" preserveAspectRatio="xMidYMid meet"></svg>
@@ -32,11 +32,7 @@
             </div>
             <div id="descriptor"></div>
         </div>
-        <p id="remarks" style="color: gray;">
-            Source: NEA via data.gov.sg <br>
-            Remarks: The air quality descriptor provided in the overview is based on the maximum reading among the five regions. 
-            Refer to the individual regions for region-specific readings and descriptors.
-        </p>
+        <p id="remarks" style="color: gray;"></p>
     </div>
     
 
