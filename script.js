@@ -32,8 +32,8 @@ const IGNORE_FOR_CENTRE = ['SOUTHERN ISLANDS', 'WESTERN ISLANDS', 'NORTH-EASTERN
 // Box offsets from the computed centre, in % of map width (x) and height (y).
 // +x moves right, +y moves down.
 const nudge = {
-  'NORTH':      { x: 2,  y: -8 },   // up, away from the centre of the island
-  'EAST':       { x: 5,  y: -2  },   // right and down, towards Changi
+  'NORTH':      { x: 2,  y: -12 },   // up, away from the centre of the island
+  'EAST':       { x: 3,  y: -2  },   // right and down, towards Changi
   'WEST':       { x: -1, y: -4.5  },   // left, out into Jurong
   'CENTRAL':    { x: -2,  y: -9 },   // up, so it doesn't sit on South
   'SOUTH':      { x: 3.5,  y: 6  },   // down, towards the southern coast
