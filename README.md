@@ -3,14 +3,9 @@
 This application provides information on the haze situation in Singapore.
 
 ## Features
-Air quality readings for the five major regions in Singapore, differentiated by the colours for each band.
-
-An overview for the day and the air quality descriptors are provided as well.
-
-- The readings, updated every hour, refers to:
-    - Air quality over the past 24 hours (24-hr PSI)
-    - Current air quality (1-hr PM2.5)
-- The five major regions refers to: North, South, East, West, and Central.
+- An overview of the air quality for the day (1-hr PM2.5 and 24-hr PSI).
+- Air quality readings for the five major regions in Singapore, differentiated by the colours for each band.
+- A health advisory guide for immediate outdoor activities, based on the current air quality given by the 1-hr PM2.5 reading. It follows the NEA guide in October 2026.
 
 
 ## Usage
@@ -25,6 +20,10 @@ Access the application website via this [link](https://keithtohx.github.io/sg-ha
 
     <img src="images/pm25.jpeg" width="300" />
     <img src="images/psi.jpeg" width="300" />
+
+- View the health advisory guide when planning for immediate outdoor activities:
+
+    <img src="images/health_advisory.png" width="300" />
 
 ## Tech Stack
 This website was developed using HTML, CSS and JavaScript.

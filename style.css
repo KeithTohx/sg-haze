@@ -59,8 +59,9 @@ h4 {
 }
 
 table, th, td {
-    padding: 0.2cqw 0.8cqw 0.2cqw 0.8cqw;
-    text-align: center;
+    padding: 0.2cqw 0.8cqw 0.4cqw 0.8cqw;
+    text-align: left;
+    vertical-align: top;
     font-size: 0.8em;
 }
 
@@ -83,11 +84,10 @@ table, th, td {
     margin-bottom: 10px; 
 }
 
-.flex-container > div {
-    /* margin-right: 20px; */
+#overview > .flex-container > div {
     width: 50%;
 }
-.flex-container > div > h4 {
+#overview > .flex-container > div > h4 {
     display: inline-block;
     margin-right: 4px;
 }

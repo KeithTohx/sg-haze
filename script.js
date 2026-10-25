@@ -149,6 +149,7 @@ cachedAjax('pm25', settings_pm25)
 function draw(geo) {
     getTimestamp();
     getOverview();
+    displayAdvisory();
     displayRemarks();
 
     const projection = d3.geoIdentity().reflectY(true).fitSize([W, H], geo);
@@ -192,16 +193,16 @@ function draw(geo) {
     $("#descriptor").html(`
                 <table class="center">
                     <tr>
-                        <td>µg/m&sup3</td>
+                        <td style="text-align: right;">µg/m&sup3</td>
                         <td style="color: green;">0 - 55</td>
-                        <td style="color: rgb(238, 190, 0);">56 - 150</td>
+                        <td style="color: rgb(240, 180, 0);">56 - 150</td>
                         <td style="color: darkorange;">151 - 250</td>
                         <td style="color: red;">Above 250</td>
                     </tr>
                     <tr>
-                        <td>Descriptor</td>
+                        <td style="text-align: right;">Descriptor</td>
                         <td style="color: green;">Normal</td>
-                        <td style="color: rgb(238, 190, 0);">Elevated</td>
+                        <td style="color: rgb(240, 180, 0);">Elevated</td>
                         <td style="color: darkorange;">High</td>
                         <td style="color: red;">Very High</td>
                     </tr>
@@ -215,16 +216,16 @@ function draw(geo) {
         $("#descriptor").html(`
                     <table class="center">
                         <tr>
-                            <td>µg/m&sup3</td>
+                            <td style="text-align: right;">µg/m&sup3</td>
                             <td style="color: green;">0 - 55</td>
-                            <td style="color: rgb(238, 190, 0);">56 - 150</td>
+                            <td style="color: rgb(240, 180, 0);">56 - 150</td>
                             <td style="color: darkorange;">151 - 250</td>
                             <td style="color: red;">Above 250</td>
                         </tr>
                         <tr>
-                            <td>Descriptor</td>
+                            <td style="text-align: right;">Descriptor</td>
                             <td style="color: green;">Normal</td>
-                            <td style="color: rgb(238, 190, 0);">Elevated</td>
+                            <td style="color: rgb(240, 180, 0);">Elevated</td>
                             <td style="color: darkorange;">High</td>
                             <td style="color: red;">Very High</td>
                         </tr>
@@ -239,16 +240,16 @@ function draw(geo) {
         $("#descriptor").html(`
                     <table class="center">
                         <tr>
-                            <td>PSI Value</td>
+                            <td style="text-align: right;">PSI Value</td>
                             <td style="color: green;">0 - 100</td>
-                            <td style="color: rgb(238, 190, 0);">101 - 200</td>
+                            <td style="color: rgb(240, 180, 0);">101 - 200</td>
                             <td style="color: darkorange;">201 - 300</td>
                             <td style="color: red;">Above 300</td>
                         </tr>
                         <tr>
-                            <td>Air Quality</td>
+                            <td style="text-align: right;">Air Quality</td>
                             <td style="color: green;">Good to Moderate</td>
-                            <td style="color: rgb(238, 190, 0);">Unhealthy</td>
+                            <td style="color: rgb(240, 180, 0);">Unhealthy</td>
                             <td style="color: darkorange;">Very Unhealthy</td>
                             <td style="color: red;">Hazardous</td>
                         </tr>
@@ -278,11 +279,50 @@ function addData(region, text, colour, element) {
         contents[region].appendChild(line);
 }
 
+function displayAdvisory() {
+    $("#advisory").html(`
+        <p style="font-size: 0.8em;">For immediate outdoor activities (1-hr PM2.5):</p>
+        <table>
+            <tr>
+                <td style="color: green;width: 1%; white-space: nowrap;">Normal<br>(0 - 55 µg/m&sup3)</td>
+                <td>CONTINUE with normal activities</td>
+            </tr>
+            <tr>
+                <td style="color: rgb(240, 180, 0);width: 1%; white-space: nowrap;">Elevated<br>(56 - 150 µg/m&sup3)</td>
+                <td>
+                    <p><i>Healthy persons: </i><br>REDUCE strenuous outdoor activities for the next hour</p> 
+                    <p><i>Vulnerable persons: </i><br>AVOID strenuous outdoor activities for the next hour</p> 
+                </td>
+            </tr>
+            <tr>
+                <td style="color: darkorange;width: 1%; white-space: nowrap;">High<br>(150 - 250 µg/m&sup3)</td>
+                <td>
+                    <p><i>Healthy persons: </i><br>AVOID strenuous outdoor activities for the next hour</p> 
+                    <p><i>Vulnerable persons: </i><br>AVOID all outdoor activities for the next hour; May wear a mask to reduce exposure</p> 
+                </td>
+            </tr>
+            <tr>
+                <td style="color: red;width: 1%; white-space: nowrap;">High<br>(Above 250 µg/m&sup3)</td>
+                <td>
+                    <p><i>Healthy persons: </i><br>MINIMISE all outdoor activities for the next hour</p> 
+                    <p><i>Vulnerable persons: </i><br>AVOID all outdoor activities for the next hour; May wear a mask to reduce exposure</p> 
+                </td>
+            </tr>
+        </table>
+        <p style="font-size: 0.7em;color: gray;">Vulnerable persons include the elderly, pregnant women, children, and persons with chronic lung disease or heart disease.</p>
+        `);
+}
+
 function displayRemarks() {
     $("#remarks").html(`
-        Source: NEA via data.gov.sg <br>
-        Remarks: The air quality descriptor provided in the overview is based on the maximum reading among the five regions. 
-        Refer to the individual regions for region-specific readings and descriptors.`);
+        Remarks:
+        <ul>
+        <li>The air quality readings are retrieved from NEA via data.gov.sg</li>
+        <li>The air quality descriptor provided in the overview is based on the maximum reading among the five regions. 
+        Refer to the individual regions for region-specific readings and descriptors.</li>
+        <li>The health advisory follows the NEA guide for immediate outdoor activities. 
+        It is not intended to be prescriptive. Refer to the latest 1-hr PM2.5 readings before proceeding with activities planned within the next few hours.</li>
+        </ul>`);
 }
 
 function getTimestamp() {
@@ -364,7 +404,7 @@ function getPSIColour(psi_value) {
     if (psi_value <= 100)
         return "green";
     else if (psi_value <= 200)
-        return "rgb(238, 190, 0)";
+        return "rgb(240, 180, 0)";
     else if (psi_value <= 300)
         return "darkorange";
     else return "red";
@@ -404,7 +444,7 @@ function getPM25Colour(pm25_value) {
     if (pm25_value <= 55)
         return "green"
     else if (pm25_value <= 150)
-        return "rgb(238, 190, 0)"
+        return "rgb(240, 180, 0)"
     else if (pm25_value <= 250)
         return "darkorange"
     else return "red"
