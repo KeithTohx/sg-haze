@@ -284,25 +284,25 @@ function displayAdvisory() {
         <p style="font-size: 0.8em;">For immediate outdoor activities (1-hr PM2.5):</p>
         <table>
             <tr>
-                <td style="color: green;width: 1%; white-space: nowrap;">Normal<br>(0 - 55 µg/m&sup3)</td>
+                <td style="color: green; width: 1%; white-space: nowrap;">Normal<br>(0 - 55 µg/m&sup3)</td>
                 <td>CONTINUE with normal activities</td>
             </tr>
             <tr>
-                <td style="color: rgb(240, 180, 0);width: 1%; white-space: nowrap;">Elevated<br>(56 - 150 µg/m&sup3)</td>
+                <td style="color: rgb(240, 180, 0); width: 1%; white-space: nowrap;">Elevated<br>(56 - 150 µg/m&sup3)</td>
                 <td>
                     <p><i>Healthy persons: </i><br>REDUCE strenuous outdoor activities for the next hour</p> 
                     <p><i>Vulnerable persons: </i><br>AVOID strenuous outdoor activities for the next hour</p> 
                 </td>
             </tr>
             <tr>
-                <td style="color: darkorange;width: 1%; white-space: nowrap;">High<br>(150 - 250 µg/m&sup3)</td>
+                <td style="color: darkorange; width: 1%; white-space: nowrap;">High<br>(150 - 250 µg/m&sup3)</td>
                 <td>
                     <p><i>Healthy persons: </i><br>AVOID strenuous outdoor activities for the next hour</p> 
                     <p><i>Vulnerable persons: </i><br>AVOID all outdoor activities for the next hour; May wear a mask to reduce exposure</p> 
                 </td>
             </tr>
             <tr>
-                <td style="color: red;width: 1%; white-space: nowrap;">High<br>(Above 250 µg/m&sup3)</td>
+                <td style="color: red; width: 1%; white-space: nowrap;">Very High<br>(Above 250 µg/m&sup3)</td>
                 <td>
                     <p><i>Healthy persons: </i><br>MINIMISE all outdoor activities for the next hour</p> 
                     <p><i>Vulnerable persons: </i><br>AVOID all outdoor activities for the next hour; May wear a mask to reduce exposure</p> 
@@ -318,7 +318,7 @@ function displayRemarks() {
         Remarks:
         <ul>
         <li>The air quality readings are retrieved from NEA via data.gov.sg</li>
-        <li>The air quality descriptor provided in the overview is based on the maximum reading among the five regions. 
+        <li>The air quality descriptor provided in the overview is based on the highest 1-hr PM2.5 reading among the five regions. 
         Refer to the individual regions for region-specific readings and descriptors.</li>
         <li>The health advisory follows the NEA guide for immediate outdoor activities. 
         It is not intended to be prescriptive. Refer to the latest 1-hr PM2.5 readings before proceeding with activities planned within the next few hours.</li>
@@ -340,8 +340,7 @@ function getOverview() {
     var pm25 = [pm25_north, pm25_south, pm25_east, pm25_west, pm25_central]
     var pm25_max = Math.max(...pm25)
     var pm25_min = Math.min(...pm25)
-    var pm25_range = pm25_min + " - " + pm25_max
-    var pm25_desc = getPM25Descriptor(pm25_max)
+    var pm25_max_desc = getPM25Descriptor(pm25_max)
 
     var psi_north = psi_values.data.items[0].readings.psi_twenty_four_hourly.north
     var psi_south = psi_values.data.items[0].readings.psi_twenty_four_hourly.south
@@ -352,30 +351,26 @@ function getOverview() {
     var psi = [psi_north, psi_south, psi_east, psi_west, psi_central]
     var psi_max = Math.max(...psi)
     var psi_min = Math.min(...psi)
-    var psi_range = psi_min + " - " + psi_max
-    var psi_desc = getPSIDescriptor(psi_max)
 
     $("#overview_title").html("Today's Air Quality Overview");
     $("#overview").html(`
         <div class="flex-container">
             <div>
-                <p style="font-size: 0.8em;">1-hr PM2.5 (µg/m&sup3)</p>
-                <h4 id="pm25_min">` + pm25_min + `</h4><h4>-</h4><h4 id="pm25_max">` + pm25_max + `</h4>
-                <p id="pm25_desc">` + pm25_desc + `</p> 
+                <p>1-hr PM2.5 (µg/m&sup3)</p>
+                <h3 id="pm25_min">` + pm25_min + `</h3><h3>-</h3><h3 id="pm25_max">` + pm25_max + `</h3>
+                <h3 id="pm25_max_desc" class="pill">` + pm25_max_desc + `</h3>
             </div>
             <div>
-                <p style="font-size: 0.8em;">24-hr PSI</p>
-                <h4 id="psi_min">` + psi_min + `</h4><h4>-</h4><h4 id="psi_max">` + psi_max + `</h4>
-                <p id="psi_desc">` + psi_desc + `</p>
+                <p>24-hr PSI</p>
+                <h3 id="psi_min">` + psi_min + `</h3><h3>-</h3><h3 id="psi_max">` + psi_max + `</h3>
             </div>
         </div>`);
 
+    $("#pm25_max_desc").css('background', getPM25Colour(pm25_max))
     $("#pm25_min").css('color', getPM25Colour(pm25_min));
     $("#pm25_max").css('color', getPM25Colour(pm25_max));
-    $("#pm25_desc").css('color', getPM25Colour(pm25_max));
     $("#psi_min").css('color', getPSIColour(psi_min));
     $("#psi_max").css('color', getPSIColour(psi_max));
-    $("#psi_desc").css('color', getPSIColour(psi_max));
 
 }
 
@@ -393,11 +388,11 @@ function getPSIValue() {
     addData('WEST', psi_west, getPSIColour(psi_west), 'h4');
     addData('CENTRAL', psi_central, getPSIColour(psi_central), 'h4');
 
-    addData('NORTH', getPSIDescriptor(psi_north), getPSIColour(psi_north), 'p');
-    addData('SOUTH', getPSIDescriptor(psi_south), getPSIColour(psi_south), 'p');
-    addData('EAST', getPSIDescriptor(psi_east), getPSIColour(psi_east), 'p');
-    addData('WEST', getPSIDescriptor(psi_west), getPSIColour(psi_west), 'p');
-    addData('CENTRAL', getPSIDescriptor(psi_central), getPSIColour(psi_central), 'p');
+    addData('NORTH', '('+ getPSIDescriptor(psi_north) +')', getPSIColour(psi_north), 'p');
+    addData('SOUTH', '('+ getPSIDescriptor(psi_south) +')', getPSIColour(psi_south), 'p');
+    addData('EAST', '('+ getPSIDescriptor(psi_east) +')', getPSIColour(psi_east), 'p');
+    addData('WEST', '('+ getPSIDescriptor(psi_west) +')', getPSIColour(psi_west), 'p');
+    addData('CENTRAL', '('+ getPSIDescriptor(psi_central) +')', getPSIColour(psi_central), 'p');
 
 }
 function getPSIColour(psi_value) {
@@ -411,12 +406,12 @@ function getPSIColour(psi_value) {
 }
 function getPSIDescriptor(psi_value) {
     if (psi_value <= 100)
-        return "(Good to Moderate)";
+        return "Good to Moderate";
     else if (psi_value <= 200)
-        return "(Unhealthy)";
+        return "Unhealthy";
     else if (psi_value <= 300)
-        return "(Very Unhealthy)";
-    else return "(Hazardous)";
+        return "Very Unhealthy";
+    else return "Hazardous";
 }
 
 function getPM25Value() {
@@ -433,11 +428,11 @@ function getPM25Value() {
     addData('WEST', pm25_west, getPM25Colour(pm25_west), 'h4');
     addData('CENTRAL', pm25_central, getPM25Colour(pm25_central), 'h4');
 
-    addData('NORTH', getPM25Descriptor(pm25_north), getPM25Colour(pm25_north), 'p');
-    addData('SOUTH', getPM25Descriptor(pm25_south), getPM25Colour(pm25_south), 'p');
-    addData('EAST', getPM25Descriptor(pm25_east), getPM25Colour(pm25_east), 'p');
-    addData('WEST', getPM25Descriptor(pm25_west), getPM25Colour(pm25_west), 'p');
-    addData('CENTRAL', getPM25Descriptor(pm25_central), getPM25Colour(pm25_central), 'p');
+    addData('NORTH', '('+ getPM25Descriptor(pm25_north) +')', getPM25Colour(pm25_north), 'p');
+    addData('SOUTH', '('+ getPM25Descriptor(pm25_south) +')', getPM25Colour(pm25_south), 'p');
+    addData('EAST', '('+ getPM25Descriptor(pm25_east) +')', getPM25Colour(pm25_east), 'p');
+    addData('WEST', '('+ getPM25Descriptor(pm25_west) +')', getPM25Colour(pm25_west), 'p');
+    addData('CENTRAL', '('+ getPM25Descriptor(pm25_central) +')', getPM25Colour(pm25_central), 'p');
 
 }
 function getPM25Colour(pm25_value) {
@@ -451,12 +446,12 @@ function getPM25Colour(pm25_value) {
 }
 function getPM25Descriptor(pm25_value) {
     if (pm25_value <= 55)
-        return "(Normal)"
+        return "Normal"
     else if (pm25_value <= 150)
-        return "(Elevated)"
+        return "Elevated"
     else if (pm25_value <= 250)
-        return "(High)"
-    else return "(Very High)"
+        return "High"
+    else return "Very High"
 }
 
 function formatTime(psi_time) {
