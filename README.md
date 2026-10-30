@@ -14,7 +14,7 @@ Access the application website via this [link](https://keithtohx.github.io/sg-ha
 - The date and time when the air quality readings was last updated is provided at the top of the page.
 - View the air quality readings at a glance with the overview:
 
-    <img src="images/overview.jpeg" width="300" />
+    <img src="images/overview.png" width="300" />
 
 - Toggle between the two buttons to view the current or past 24-hour air quality readings for each region:
 
